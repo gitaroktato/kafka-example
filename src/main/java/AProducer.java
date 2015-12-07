@@ -21,7 +21,7 @@ public class AProducer {
         Producer<String, String> producer = new KafkaProducer<>(props);
         IntStream.range(0, 10).forEach((i) -> {
                 ProducerRecord < String, String > toSend = new ProducerRecord<>(
-                "new-topic", null, "message_" + i);
+                Configuration.TOPIC_NAME, null, "message_" + i);
                 producer.send(toSend);
         });
         producer.close();
