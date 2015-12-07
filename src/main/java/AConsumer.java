@@ -1,41 +1,51 @@
-import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.clients.consumer.ConsumerRecords;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
+import kafka.consumer.Consumer;
+import kafka.consumer.ConsumerConfig;
+import kafka.consumer.KafkaStream;
+import kafka.javaapi.consumer.ConsumerConnector;
+import kafka.message.MessageAndMetadata;
+import kafka.serializer.Decoder;
+import kafka.serializer.StringDecoder;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
 public class AConsumer {
 
-    public static void main(String[] args) throws Exception {
+    private static ConsumerConfig createConsumerConfig(String a_zookeeper, String a_groupId) {
         Properties props = new Properties();
-        props.put("bootstrap.servers", "localhost:9092");
-        props.put("group.id", "");
-        props.put("partition.assignment.strategy", "org.apache.kafka.clients.consumer.RangeAssignor");
-        props.put("enable.auto.commit", "true");
+        props.put("zookeeper.connect", a_zookeeper);
+        props.put("group.id", a_groupId);
+        props.put("zookeeper.session.timeout.ms", "400");
+        props.put("zookeeper.sync.time.ms", "200");
         props.put("auto.commit.interval.ms", "1000");
-        props.put("session.timeout.ms", "30000");
-        props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
-        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-        consumer.subscribe("new-topic");
-        while (true) {
-            Map<String, ConsumerRecords<String, String>> records = consumer.poll(200);
-            if (records != null)
-                process(records);
+        return new ConsumerConfig(props);
+    }
+
+    public static void main(String[] args) throws Exception {
+        ConsumerConnector consumer = Consumer.createJavaConsumerConnector(
+                createConsumerConfig(Configuration.ZOOKEEPER_HOST, "group"));
+        Map<String, Integer> topicCountMap = createTopicCountMap();
+        Decoder<String> decoder = new StringDecoder(null);
+        Map<String, List<KafkaStream<String, String>>> streams =
+                consumer.createMessageStreams(topicCountMap, decoder, decoder);
+        List<KafkaStream<String, String>> justMyStreams = streams.get(Configuration.TOPIC_NAME);
+        justMyStreams.forEach(AConsumer::consume);
+    }
+
+    private static void consume(KafkaStream<String, String> stream) {
+        for (MessageAndMetadata<String, String> msg : stream) {
+            String echo = String.format("Got message: %s, %s, %s",
+                    msg.topic(), msg.key(), msg.message());
+            System.out.println(echo);
         }
     }
 
-    private static void process(Map<String, ConsumerRecords<String, String>> records) throws Exception {
-        for (Map.Entry<String, ConsumerRecords<String, String>> recordMetadata : records.entrySet()) {
-            List<ConsumerRecord<String, String>> recordsPerTopic = recordMetadata.getValue().records();
-            for (ConsumerRecord<String, String> record : recordsPerTopic) {
-                // process record
-                System.out.printf("offset = %d, key = %s, value = %s",
-                        record.offset(), record.key(), record.value());
-            }
-        }
+    private static Map<String, Integer> createTopicCountMap() {
+        Map<String, Integer> result = new HashMap<>();
+        result.put(Configuration.TOPIC_NAME, 1);
+        return result;
     }
 }
 
