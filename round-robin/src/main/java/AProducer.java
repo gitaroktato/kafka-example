@@ -20,8 +20,9 @@ public class AProducer {
 
         Producer<String, String> producer = new KafkaProducer<>(props);
         IntStream.range(0, 10).forEach((i) -> {
+                System.out.println(i+"_key".hashCode());
                 ProducerRecord < String, String > toSend = new ProducerRecord<>(
-                Configuration.TOPIC_NAME, i + "", "message_" + i);
+                Configuration.TOPIC_NAME, i + "_key", "message_" + i);
                 producer.send(toSend);
         });
         producer.close();

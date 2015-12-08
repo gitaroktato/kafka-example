@@ -26,7 +26,7 @@ public class AConsumer {
 
     public static void main(String[] args) throws Exception {
         ConsumerConnector consumer = Consumer.createJavaConsumerConnector(
-                createConsumerConfig(Configuration.ZOOKEEPER_HOST, "roundrobin"));
+                createConsumerConfig(Configuration.ZOOKEEPER_HOST, "round2"));
         Map<String, Integer> topicCountMap = createTopicCountMap();
         Decoder<String> decoder = new StringDecoder(null);
         Map<String, List<KafkaStream<String, String>>> streams =
