@@ -1,5 +1,4 @@
-include  'point-to-point'
-include  'round-robin'
+include  'common', 'point-to-point', 'round-robin'
 
 rootProject.name = 'kafka-example'
 
