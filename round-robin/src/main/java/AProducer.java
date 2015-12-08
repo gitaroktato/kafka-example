@@ -19,7 +19,7 @@ public class AProducer {
         props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 
         Producer<String, String> producer = new KafkaProducer<>(props);
-        IntStream.range(0, 10).forEach((i) -> {
+        IntStream.range(0, 255).forEach((i) -> {
                 final String key = i+"_key";
                 final String value = "message_" + i;
                 ProducerRecord < String, String > toSend = new ProducerRecord<>(
