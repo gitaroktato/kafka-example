@@ -30,7 +30,7 @@ public class AConsumer {
         Decoder<String> decoder = new StringDecoder(null);
         Map<String, List<KafkaStream<String, String>>> streams =
                 consumer.createMessageStreams(topicCountMap, decoder, decoder);
-        List<KafkaStream<String, String>> justMyStreams = streams.get(Configuration.TOPIC_NAME);
+        List<KafkaStream<String, String>> justMyStreams = streams.get(Topic.TOPIC_NAME);
         justMyStreams.forEach(AConsumer::consume);
     }
 
@@ -44,7 +44,7 @@ public class AConsumer {
 
     private static Map<String, Integer> createTopicCountMap() {
         Map<String, Integer> result = new HashMap<>();
-        result.put(Configuration.TOPIC_NAME, 1);
+        result.put(Topic.TOPIC_NAME, 1);
         return result;
     }
 }

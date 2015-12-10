@@ -1,4 +1,4 @@
-include  'common', 'point-to-point', 'round-robin'
+include  'common', 'point-to-point', 'round-robin', 'topic-creation', 'key-by-category'
 
 rootProject.name = 'kafka-example'
 

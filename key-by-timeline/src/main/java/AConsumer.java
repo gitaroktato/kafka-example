@@ -13,20 +13,21 @@ import java.util.Properties;
 
 public class AConsumer {
 
+    public static final String CONSUMER_GROUP = "group";
+
     private static ConsumerConfig createConsumerConfig(String a_zookeeper, String a_groupId) {
         Properties props = new Properties();
         props.put("zookeeper.connect", a_zookeeper);
         props.put("group.id", a_groupId);
         props.put("zookeeper.session.timeout.ms", "400");
         props.put("zookeeper.sync.time.ms", "200");
-        props.put("partition.assignment.strategy", "roundrobin");
         props.put("auto.commit.interval.ms", "1000");
         return new ConsumerConfig(props);
     }
 
     public static void main(String[] args) throws Exception {
         ConsumerConnector consumer = Consumer.createJavaConsumerConnector(
-                createConsumerConfig(Configuration.ZOOKEEPER_HOST, "group"));
+                createConsumerConfig(Configuration.ZOOKEEPER_HOST, CONSUMER_GROUP));
         Map<String, Integer> topicCountMap = createTopicCountMap();
         Decoder<String> decoder = new StringDecoder(null);
         Map<String, List<KafkaStream<String, String>>> streams =
@@ -37,10 +38,14 @@ public class AConsumer {
 
     private static void consume(KafkaStream<String, String> stream) {
         for (MessageAndMetadata<String, String> msg : stream) {
-            String echo = String.format("Got message: %s, %s, %s",
-                    msg.topic(), msg.key(), msg.message());
-            System.out.println(echo);
+            logKafkaMessage(msg);
         }
+    }
+
+    private static void logKafkaMessage(MessageAndMetadata<String, String> msg) {
+        String echo = String.format("Got message: [topic: %s], [partition: %s], [offset: %s], [key: %s], [payload: %s]",
+                msg.topic(), msg.partition(), msg.offset(), msg.key(), msg.message());
+        System.out.println(echo);
     }
 
     private static Map<String, Integer> createTopicCountMap() {
