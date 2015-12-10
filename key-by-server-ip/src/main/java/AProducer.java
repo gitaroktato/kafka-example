@@ -1,12 +1,15 @@
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.Producer;
-import org.apache.kafka.clients.producer.ProducerRecord;
-
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 import java.util.stream.IntStream;
 
 public class AProducer {
+
+    public enum Server {
+        $192_168_11_21, $192_168_11_22, $192_168_11_23, $192_168_11_24, $192_168_11_25, $192_168_11_28,
+                $192_168_11_29, $192_168_11_30
+    }
 
     public static void main(String[] args) throws IOException {
         Properties props = new Properties();
@@ -21,9 +24,10 @@ public class AProducer {
 
         try (SimpleProducer producer = new SimpleProducer(Topic.TOPIC_NAME, props)) {
             producer.connect();
-            IntStream.range(0, 255).forEach((i) -> {
+            IntStream.range(0, 225).forEach((i) -> {
                 String body = "message_" + i;
-                producer.send(body);
+                Server server = Server.values()[i % Server.values().length];
+                producer.send(server.toString(), body);
             });
         }
     }

@@ -1,4 +1,12 @@
-include  'common', 'point-to-point', 'round-robin', 'topic-creation', 'key-by-category'
+include 'common',
+        'point-to-point',
+        'round-robin',
+        'topic-creation',
+        'key-by-category',
+        'key-by-timeline',
+        'key-by-server-ip',
+        'topic',
+        'offset-reseting'
 
 rootProject.name = 'kafka-example'
 

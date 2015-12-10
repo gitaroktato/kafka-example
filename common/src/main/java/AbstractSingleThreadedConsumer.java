@@ -12,13 +12,13 @@ import java.util.Map;
 /**
  * Created by Oresztesz_Margaritis on 12/10/2015.
  */
-public class SingleThreadedConsumer {
+public abstract class AbstractSingleThreadedConsumer {
 
     private final ConsumerConfig config;
     private final String topicName;
     public static final Decoder<String> STRING_DECODER = new StringDecoder(null);
 
-    public SingleThreadedConsumer(ConsumerConfig config, String topicName) throws Exception {
+    public AbstractSingleThreadedConsumer(ConsumerConfig config, String topicName) throws Exception {
         this.config = config;
         this.topicName = topicName;
     }
@@ -29,14 +29,16 @@ public class SingleThreadedConsumer {
 
         consumer.createMessageStreams(topicCountMap, STRING_DECODER, STRING_DECODER)
                 .get(topicName)
-                .forEach(this::consumeAndLog);
+                .forEach(this::consumeAll);
     }
 
-    private void consumeAndLog(KafkaStream<String, String> stream) {
+    private void consumeAll(KafkaStream<String, String> stream) {
         for (MessageAndMetadata<String, String> msg : stream) {
-            Logger.logKafkaMessage(msg);
+            consume(msg);
         }
     }
+
+    protected abstract void consume(MessageAndMetadata<String, String> stream);
 
     private  Map<String, Integer> createTopicCountMap() {
         Map<String, Integer> result = new HashMap<>();

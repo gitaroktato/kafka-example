@@ -2,7 +2,7 @@ import kafka.consumer.ConsumerConfig;
 
 import java.util.Properties;
 
-public class AConsumer {
+public class ConsumerGroupTwo {
 
     private static ConsumerConfig createConsumerConfig(String a_zookeeper, String a_groupId) {
         Properties props = new Properties();
@@ -15,7 +15,7 @@ public class AConsumer {
     }
 
     public static void main(String[] args) throws Exception {
-        ConsumerConfig config = createConsumerConfig(Configuration.ZOOKEEPER_HOST, "group");
+        ConsumerConfig config = createConsumerConfig(Configuration.ZOOKEEPER_HOST, "topicGroupTwo");
         SimpleConsumer consumer = new SimpleConsumer(config, Topic.TOPIC_NAME);
         consumer.start();
     }
